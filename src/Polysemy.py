@@ -10,6 +10,7 @@ from composes.matrix.dense_matrix import DenseMatrix
 from composes.matrix.sparse_matrix import SparseMatrix
 from composes.semantic_space.space import Space
 from composes.similarity.cos import CosSimilarity
+from composes.composition.lexical_function import LexicalFunction
 from composes.similarity.similarity import Similarity
 from composes.transformation.scaling.row_normalization import RowNormalization
 from scipy.stats import pearsonr, spearmanr
@@ -86,27 +87,57 @@ class AdditiveModel(Model):
     
     def fit(self, train_pairs, verbose=False):
         if len(train_pairs) == 0:
-            # raise NameError('Error: Train set is empty')
-	    warnings.warn('fit: train set is empty, defaulting to baseline', UserWarning)
+            raise NameError('Error: Train set is empty')
+	        #warnings.warn('fit: train set is empty, defaulting to baseline', UserWarning)
             # set difference vector to empty vector
-            self.diff_vector = DenseMatrix(sp.zeros(1))
+            #self.diff_vector = DenseMatrix(sp.zeros(1))
         else:
-          if verbose:
+            if verbose:
               print 'fit: Computing the diff vector across %d pairs' % (len(train_pairs))
-          (_, n) = sp.shape(self.space.cooccurrence_matrix)
-          if isinstance(self.space.cooccurrence_matrix, DenseMatrix):
-            self.diff_vector = DenseMatrix(sp.zeros(n))
-          else:
-            self.diff_vector = SparseMatrix(sp.zeros(n))
-          for (base, derived) in train_pairs:
-              diff = self.space.get_row(derived) - self.space.get_row(base)
-              self.diff_vector += diff
-          self.diff_vector = self.diff_vector / len(train_pairs)
+            (_, n) = sp.shape(self.space.cooccurrence_matrix)
+            if isinstance(self.space.cooccurrence_matrix, DenseMatrix):
+                self.diff_vector = DenseMatrix(sp.zeros(n))
+            else:
+                self.diff_vector = SparseMatrix(sp.zeros(n))
+            for (base, derived) in train_pairs:
+                diff = self.space.get_row(derived) - self.space.get_row(base)
+                self.diff_vector += diff
+            self.diff_vector = self.diff_vector / len(train_pairs)
         
     def predict(self, base, verbose=False) :
         if self.diff_vector == None: 
             raise NameError('Error: Model has not yet been trained')
         return self.space.get_row(base) + self.diff_vector
+
+##############################################################################
+# Lexfun model
+# This uses the DISSECT's LexicalFunction class, which turned out to be a
+# bit awkward as the APIs are quite different
+
+class LexfunModel(Model):
+
+    lexfun = None
+
+    def __init__(self, space):
+        super(LexfunModel, self).__init__(space)
+        self.lexfun = LexicalFunction(self.space)
+
+    def fit(self, train_pairs, verbose=False):
+        if len(train_pairs) == 0:
+            raise NameError('Error: Train set is empty')
+        else:
+            if verbose:
+                print 'fit: Fitting a lexfun model on %d pairs' % (len(train_pairs))
+            # LexicalFunction class is designed to be run on a dataset with different function words (==patterns).
+            # We use a dummy function word here.
+            train_pairs_ext = [('dummy', base, derived) for (base, derived) in train_pairs]
+            lexfun.train(train_pairs_ext, self.space, self.space)
+
+def predict(self, base, verbose=False):
+    if self.lexfun == None:
+        raise NameError('Error: Model has not yet been trained')
+    composed_space = lexfun.compose([('dummy', base, 'derived')])
+    return composed_space.get_row('derived')
 
 ##############################################################################
 # Exemplar model
