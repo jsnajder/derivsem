@@ -132,7 +132,7 @@ class LexfunModel(Model):
             # LexicalFunction class is designed to be run on a dataset with different function words (==patterns).
             # We use a dummy function word here.
             train_pairs_ext = [('dummy', base, derived) for (base, derived) in train_pairs]
-            lexfun.train(train_pairs_ext, self.space, self.space)
+            self.lexfun.train(train_pairs_ext, self.space, self.space)
 
 def predict(self, base, verbose=False):
     if self.lexfun == None:
@@ -380,6 +380,8 @@ def score(model, test_pairs, n_neighbors=5, pos=None, verbose=False):
 # all vectors from the model's space are inspected. If the correct target is not among the neighors of the predicted
 # vector, the reciprocal rank is set to zero.
 def mrr_score(model, test_pairs, max_neighbors=None, pos=None, verbose=False):
+    if verbose:
+        print("Computing MRR score on %d pairs" % len(test_pairs))
     mrr = 0
     for (base, derived) in test_pairs:
         neighbors = get_neighbors(model.predict(base, verbose), model.space, max_neighbors, pos)
