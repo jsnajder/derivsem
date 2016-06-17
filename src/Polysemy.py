@@ -383,14 +383,14 @@ def mrr_score(model, test_pairs, max_neighbors=None, pos=None, verbose=False):
     mrr = 0
     for (base, derived) in test_pairs:
         neighbors = get_neighbors(model.predict(base, verbose), model.space, max_neighbors, pos)
-        rank = None
+        rank = 0
         for i, (w, _) in enumerate(neighbors):
             if w == derived:
                 rank = i + 1
                 break
         if verbose:
             print("%s: correct target '%s' is at rank %d out of %d" % (base, derived, rank, len(neighbors)))
-        mrr += 0 if rank == None else 1 / float(rank)
+        mrr += 0 if rank == 0 else 1 / float(rank)
     return mrr / len(test_pairs)
 
 # splits integer 'm' into 'n' balanced bins
