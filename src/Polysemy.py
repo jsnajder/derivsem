@@ -11,11 +11,10 @@ from composes.matrix.sparse_matrix import SparseMatrix
 from composes.semantic_space.space import Space
 from composes.similarity.cos import CosSimilarity
 from composes.composition.lexical_function import LexicalFunction
-from composes.similarity.similarity import Similarity
-from composes.transformation.scaling.row_normalization import RowNormalization
+from composes.utils.regression_learner import LstsqRegressionLearner
+from composes.utils.regression_learner import RidgeRegressionLearner
 from scipy.stats import pearsonr, spearmanr
 import scipy as sp
-from operator import itemgetter
 from scipy import stats 
 from sklearn import mixture
 from sklearn.cluster import KMeans
@@ -23,10 +22,8 @@ from operator import itemgetter
 import functools
 from sklearn.cross_validation import KFold
 from scipy.sparse import csr_matrix
-from scipy.sparse import csr_matrix
 from k_medoids import KMedoids
 import warnings
-from itertools import ifilter
 
 ##############################################################################
 # Helpers
@@ -119,9 +116,15 @@ class LexfunModel(Model):
 
     lexfun = None
 
-    def __init__(self, space):
-        super(LexfunModel, self).__init__(space)
-        self.lexfun = LexicalFunction(self.space)
+    def __init__(self, space, learner=None, param=None):
+        #super(LexfunModel, self).__init__(space)
+        Model.__init__(space)
+        if learner == 'Ridge':
+            # If param==None, generalized CV will be performed within standard param range
+            learner = RidgeRegressionLearner(param)
+        else:
+            learner = LstsqRegressionLearner()
+        self.lexfun = LexicalFunction(self.space, learner=learner)
 
     def fit(self, train_pairs, verbose=False):
         if len(train_pairs) == 0:
