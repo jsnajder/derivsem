@@ -118,7 +118,7 @@ class LexfunModel(Model):
 
     def __init__(self, space, learner=None, param=None):
         #super(LexfunModel, self).__init__(space)
-        Model.__init__(space)
+        Model.__init__(self, space)
         if learner == 'Ridge':
             # If param==None, generalized CV will be performed within standard param range
             learner = RidgeRegressionLearner(param)
