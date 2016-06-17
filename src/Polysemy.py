@@ -385,7 +385,7 @@ def mrr_score(model, test_pairs, max_neighbors=None, pos=None, verbose=False):
         neighbors = get_neighbors(model.predict(base, verbose), model.space, max_neighbors, pos)
         rank = len(neighbors) + 1
         for i, (w, _) in enumerate(neighbors):
-            if w == base:
+            if w == derived:
                 rank = i + 1
                 break
         if verbose:
