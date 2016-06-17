@@ -134,12 +134,12 @@ class LexfunModel(Model):
             train_pairs_ext = [('dummy', base, derived) for (base, derived) in train_pairs]
             self.lexfun.train(train_pairs_ext, self.space, self.space)
 
-def predict(self, base, verbose=False):
-    if self.lexfun == None:
-        raise NameError('Error: Model has not yet been trained')
-    composed_space = self.lexfun.compose([('dummy', base, 'derived')], self.space)
-    print composed_space
-    return composed_space.get_row('derived')
+    def predict(self, base, verbose=False):
+        if self.lexfun == None:
+            raise NameError('Error: Model has not yet been trained')
+        composed_space = self.lexfun.compose([('dummy', base, 'derived')], self.space)
+        print composed_space
+        return composed_space.get_row('derived')
 
 ##############################################################################
 # Exemplar model
