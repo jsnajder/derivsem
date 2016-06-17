@@ -137,7 +137,7 @@ class LexfunModel(Model):
 def predict(self, base, verbose=False):
     if self.lexfun == None:
         raise NameError('Error: Model has not yet been trained')
-    composed_space = lexfun.compose([('dummy', base, 'derived')])
+    composed_space = self.lexfun.compose([('dummy', base, 'derived')])
     return composed_space.get_row('derived')
 
 ##############################################################################
