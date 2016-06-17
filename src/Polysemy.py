@@ -124,7 +124,7 @@ class LexfunModel(Model):
             learner = RidgeRegressionLearner(param)
         else:
             learner = LstsqRegressionLearner()
-        self.lexfun = LexicalFunction(self.space, learner=learner)
+        self.lexfun = LexicalFunction(learner=learner)
 
     def fit(self, train_pairs, verbose=False):
         if len(train_pairs) == 0:
