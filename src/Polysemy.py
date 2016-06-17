@@ -32,7 +32,7 @@ import warnings
 def conjunction(*conditions):
     return functools.reduce(sp.logical_and, conditions)
 
-# Cosine distance that works with bost 'matrix' (dense) and 'csr_matrix'
+# Cosine distance that works with both 'matrix' (dense) and 'csr_matrix'
 # (sparse) types (unlike cosine distance from 'scipy.spatial.distance')
 def my_dot(v1, v2): return v1.dot(v2.T)
 def my_norm(v): return sp.sqrt(my_dot(v, v)[0, 0])
