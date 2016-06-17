@@ -48,7 +48,7 @@ def get_row_dense(space, word):
 ##############################################################################
 
 def evalCorrelation(y_predict, y_gold) :
-    cov = len(filter(lambda yp : yp != 0, y_predict))
+    cov = len(filter(lambda yp : yp > 0, y_predict))
     xs = filter(lambda y : y[1] != 0, zip(y_gold, y_predict))
     [y_gold_cov, y_predict_cov] = zip(*xs)
     r = pearsonr(y_gold, y_predict)[0]
