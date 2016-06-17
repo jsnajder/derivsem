@@ -388,6 +388,8 @@ def mrr_score(model, test_pairs, max_neighbors=None, pos=None, verbose=False):
             if w == base:
                 rank = i
                 break
+        if verbose:
+            print('%s: correct target is at rank %d out of %d' % (base, rank, len(neighbors)))
         mrr += 1 / float(rank)
     return mrr / len(test_pairs)
 
