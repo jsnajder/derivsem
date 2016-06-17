@@ -378,19 +378,19 @@ def score(model, test_pairs, n_neighbors=5, pos=None, verbose=False):
 
 # Returns the mean reciprocal rank, by inspecting max_neighbors around the predicted vector. If max_neighbors==None,
 # all vectors from the model's space are inspected. If the correct target is not among the neighors of the predicted
-# vector, the rank is set to 1/max_neighbors + 1.
+# vector, the reciprocal rank is set to zero.
 def mrr_score(model, test_pairs, max_neighbors=None, pos=None, verbose=False):
     mrr = 0
     for (base, derived) in test_pairs:
         neighbors = get_neighbors(model.predict(base, verbose), model.space, max_neighbors, pos)
-        rank = len(neighbors) + 1
+        rank = None
         for i, (w, _) in enumerate(neighbors):
             if w == derived:
                 rank = i + 1
                 break
         if verbose:
-            print('%s: correct target is at rank %d out of %d' % (base, rank, len(neighbors)))
-        mrr += 1 / float(rank)
+            print("%s: correct target '%s' is at rank %d out of %d" % (base, derived, rank, len(neighbors)))
+        mrr += 0 if rank == None else 1 / float(rank)
     return mrr / len(test_pairs)
 
 # splits integer 'm' into 'n' balanced bins
