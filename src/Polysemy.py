@@ -26,6 +26,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse import csr_matrix
 from k_medoids import KMedoids
 import warnings
+from itertools import ifilter
 
 ##############################################################################
 # Helpers
@@ -344,10 +345,12 @@ def space_pos_filter(space, pos):
     cols = space.id2column
     return Space(m, rows, cols)
 
-# Gets nearest neighbors of a given vector (Composes has no function for that)
+# Gets nearest neighbors of a given vector (DISSECT has no function for that)
+# If n_neighbors == None, returns all neighbors (sorted by cosine similarity)
 def get_neighbors(vector, space, n_neighbors=5, pos=None):
-    if pos!=None: space = space_pos_filter(space, pos)
+    if pos != None: space = space_pos_filter(space, pos)
     targets = space.id2row
+    if n_neighbors == None: n_neighbors = len(targets)
     n_neighbors = min(n_neighbors, len(targets))
     sims_to_matrix = CosSimilarity().get_sims_to_matrix(vector, space.cooccurrence_matrix)
     sorted_perm = sims_to_matrix.sorted_permutation(sims_to_matrix.sum, 1)
@@ -355,7 +358,7 @@ def get_neighbors(vector, space, n_neighbors=5, pos=None):
 
 # Computes recall out of N (RooN); default N=5
 # Returns the number of true positives and RooN
-def score(model, test_pairs, n_neighbors=5, pos=None, verbose=False) :
+def score(model, test_pairs, n_neighbors=5, pos=None, verbose=False):
     hits = 0
     # TODO: so speed up, pos-filter space here and only once for the complete pattern
     for (base, derived) in test_pairs:
@@ -372,6 +375,21 @@ def score(model, test_pairs, n_neighbors=5, pos=None, verbose=False) :
     score = float(hits) / len(test_pairs)
     if verbose : print "=> Score: %d out of %d (%.2f%%)" % (hits, len(test_pairs), score)
     return (hits, score)
+
+# Returns the mean reciprocal rank, by inspecting max_neighbors around the predicted vector. If max_neighbors==None,
+# all vectors from the model's space are inspected. If the correct target is not among the neighors of the predicted
+# vector, the rank is set to 1/max_neighbors + 1.
+def mrr_score(model, test_pairs, max_neighbors=None, pos=None, verbose=False):
+    mrr = 0
+    for (base, derived) in test_pairs:
+        neighbors = get_neighbors(model.predict(base, verbose), model.space, max_neighbors, pos)
+        rank = len(neighbors) + 1
+        for i, (w, _) in enumerate(neighbors):
+            if w == base:
+                rank = i
+                break
+        mrr += 1 / float(rank)
+    return mrr / len(test_pairs)
 
 # splits integer 'm' into 'n' balanced bins
 def split_integer(n, m):
