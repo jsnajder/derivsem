@@ -491,7 +491,7 @@ def index_partitions(proportions, random_state=None):
     for i, m in enumerate(ms):
         xs. extend([i] * m)
     sp.random.seed(random_state)
-    zs = shuffle(n)
+    zs = shuffle(xs)
     return zs[:n]
 
 
