@@ -480,6 +480,17 @@ def cv_ixs(n, folds, shuffle=True, random_state=None):
         return ixs
 
 
+# Generates a list of n indices, each indexing one of len(proportions) partitions, according to given proportions.
+# E.g., 50 [0.5, 0.3, 0.2]
+def index_partitions(n, proportions):
+    s = float(sum(proportions))
+    ms = [int(round(p / s * n)) for p in proportions]
+    xs = []
+    for i, m in enumerate(ms):
+        xs. extend([i] * m)
+    return xs
+
+
 # Computes RooN using cross-validation (default: 10 folds)
 # Returns RooN and margin of error, by default at 95% confidence
 def score_cv(model, pairs, folds=10, random_state=None, n_neighbors=5, shuffle=True,
