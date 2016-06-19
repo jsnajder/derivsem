@@ -24,7 +24,7 @@ from sklearn.cross_validation import KFold
 from scipy.sparse import csr_matrix
 from k_medoids import KMedoids
 import warnings
-from random import shuffle
+import random
 
 ##############################################################################
 # Helpers
@@ -481,18 +481,17 @@ def cv_ixs(n, folds, shuffle=True, random_state=None):
         return ixs
 
 
-# Generates a list of len(proportions) indices, each indexing one of the partitions, according to given proportions.
-# E.g., [0.5, 0.3, 0.2]
-def index_partitions(proportions, random_state=None):
-    n = len(proportions)
+# Generates a list of 'n' indices, each indexing one of the len(proportions), according to given proportions.
+# E.g., 50 [0.5, 0.3, 0.2]
+def index_partitions(n, proportions, random_state=None):
     s = float(sum(proportions))
     ms = [int(round(p / s * n)) for p in proportions]
     xs = []
     for i, m in enumerate(ms):
         xs. extend([i] * m)
-    sp.random.seed(random_state)
-    zs = shuffle(xs)
-    return zs[:n]
+    random.seed(random_state)
+    random.shuffle(xs)
+    return xs[:n]
 
 
 # Computes RooN using cross-validation (default: 10 folds)
