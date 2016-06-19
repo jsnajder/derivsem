@@ -488,7 +488,7 @@ def index_partitions(n, proportions):
     xs = []
     for i, m in enumerate(ms):
         xs. extend([i] * m)
-    return xs
+    return xs[:n]
 
 
 # Computes RooN using cross-validation (default: 10 folds)
