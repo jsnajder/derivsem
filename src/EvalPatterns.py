@@ -10,7 +10,7 @@ from composes.semantic_space.space import Space
 from composes.utils import io_utils
 from composes.transformation.scaling.row_normalization import RowNormalization
 
-from Polysemy import *
+from Models import *
 
 
 ##############################################################################
