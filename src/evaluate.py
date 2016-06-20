@@ -65,7 +65,7 @@ def main():
     partitioned_pairs_df = partition_pairs(pairs_df, split, random_state=42)
 
 
-    df = evaluate(partitioned_pairs_df, random_state=42, verbose=True)
+    df = evaluate(partitioned_pairs_df, verbose=False)
 
     df.to_pickle(results_dir + space + '.pkl')
 
