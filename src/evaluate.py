@@ -46,7 +46,7 @@ def evaluate(partitioned_pairs_df, models_dict, patterns=None, verbose=False):
 
 def main():
 
-    pairs_file = sys.arg[1]
+    pairs_file = sys.argv[1]
     space = sys.argv[2]
     results_dir = sys.argv[3]
 
