@@ -34,7 +34,7 @@ def evaluate(partitioned_pairs_df, models_dict, patterns=None, verbose=False):
         for pattern, pairs_df in partitioned_pairs_df.groupby('pattern'):
             print model_name, pattern
             train_pairs = get_word_pairs(filter_pairs(pairs_df, pattern, 0))
-            model.fit(train_pairs, vebose=False)
+            model.fit(train_pairs, verbose=verbose)
             _, target_pos = pattern_pos(pattern)
             scores_test = reciprocal_rank_scores(model, get_word_pairs(pairs_df), pos=target_pos, verbose=verbose)
             pairs_df.loc[:, 'baseline-cbow-w5'] = pd.Series(scores_test, index=pairs_df.index)
@@ -66,7 +66,7 @@ def main():
     models = {
         'baseline': BaselineModel(space),
         'add': AdditiveModel(space),
-        'lexfun': LexfunModel(space)
+        'lexfun': LexfunModel(space, learner='Ridge')
     }
 
     split = [0.5, 0.3, 0.2]
