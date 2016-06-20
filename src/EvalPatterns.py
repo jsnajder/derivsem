@@ -4,9 +4,7 @@
 # usage: python EvalPatterns.py [ppmi|cbow] <pairs.txt> <pattern_set_string> <results_dir>
 
 import sys
-import scipy as sp
 import pandas as pd
-from composes.semantic_space.space import Space
 from composes.utils import io_utils
 from composes.transformation.scaling.row_normalization import RowNormalization
 
