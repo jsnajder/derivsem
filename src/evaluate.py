@@ -47,7 +47,7 @@ def evaluate(partitioned_pairs_df, models_dict, patterns=None, verbose=False):
 def main():
 
     pairs_file = sys.argv[1]
-    space = sys.argv[2]
+    space_id = sys.argv[2]
     results_dir = sys.argv[3]
 
     pairs_df = pd.read_csv(pairs_file, sep=' ')
@@ -59,13 +59,13 @@ def main():
         'ppmi': 'count-based/sdewac_2015-11-23/sdewac-mst.prepro.bow-c10k-w5.ppmi.matrix.pkl'
     }
 
-    space = io_utils.load(data_path + space_file[space]).apply(RowNormalization(criterion='length'))
+    space = io_utils.load(data_path + space_file[space_id]).apply(RowNormalization(criterion='length'))
 
     split = [0.5, 0.3, 0.2]
     partitioned_pairs_df = partition_pairs(pairs_df, split, random_state=42)
 
 
-    df = evaluate(partitioned_pairs_df, verbose=False)
+    df = evaluate(partitioned_pairs_df, {space_id : space}, verbose=False)
 
     df.to_pickle(results_dir + space + '.pkl')
 

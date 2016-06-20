@@ -16,6 +16,7 @@ def index_partitions(n, proportions, random_state=None):
 
 
 def partition_pairs(pairs_df, split, random_state=None):
+    # type: (object, object, object) -> object
     df = pd.DataFrame()
     ps = []
     for _, p in pairs_df.groupby('pattern'):
