@@ -75,9 +75,9 @@ def main():
 
     df = evaluate(partitioned_pairs_df, {model_id: models[model_id]}, verbose=False)
 
-    df.to_pickle(results_dir + space + '.pkl')
+    df.to_pickle(results_dir + model_id + '-' + space_id + '.pkl')
 
-    writer = pd.ExcelWriter(results_dir + space + '.xlsx')
+    writer = pd.ExcelWriter(results_dir + model_id + '-' + space_id + '.xlsx')
     df.to_excel(writer, space)
     writer.save()
 
