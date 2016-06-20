@@ -12,6 +12,7 @@ from composes.utils import io_utils
 import sys
 from Data import filter_pairs, get_word_pairs, pattern_pos, partition_pairs
 from Evaluation import reciprocal_rank_scores
+from Models import BaselineModel, AdditiveModel, LexfunModel
 
 
 ##############################################################################
@@ -47,8 +48,9 @@ def evaluate(partitioned_pairs_df, models_dict, patterns=None, verbose=False):
 def main():
 
     pairs_file = sys.argv[1]
-    space_id = sys.argv[2]
-    results_dir = sys.argv[3]
+    model_id = sys.argv[2]
+    space_id = sys.argv[3]
+    results_dir = sys.argv[4]
 
     pairs_df = pd.read_csv(pairs_file, sep=' ')
 
@@ -61,11 +63,16 @@ def main():
 
     space = io_utils.load(data_path + space_file[space_id]).apply(RowNormalization(criterion='length'))
 
+    models = {
+        'baseline': BaselineModel(space),
+        'add': AdditiveModel(space),
+        'lexfun': LexfunModel(space)
+    }
+
     split = [0.5, 0.3, 0.2]
     partitioned_pairs_df = partition_pairs(pairs_df, split, random_state=42)
 
-
-    df = evaluate(partitioned_pairs_df, {space_id : space}, verbose=False)
+    df = evaluate(partitioned_pairs_df, {model_id: models[model_id]}, verbose=False)
 
     df.to_pickle(results_dir + space + '.pkl')
 
