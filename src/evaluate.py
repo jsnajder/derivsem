@@ -37,7 +37,7 @@ def evaluate(partitioned_pairs_df, models_dict, patterns=None, verbose=False):
             model.fit(train_pairs, verbose=verbose)
             _, target_pos = pattern_pos(pattern)
             scores_test = reciprocal_rank_scores(model, get_word_pairs(pairs_df), pos=target_pos, verbose=verbose)
-            df = pairs_df[['word1', 'word2', 'partition']]
+            df = pairs_df[['word1', 'word2', 'partition']].copy()
             df.loc[:, 'baseline-cbow-w5'] = pd.Series(scores_test, index=df.index)
             dfs.append(df)
         return pd.concat(dfs)
