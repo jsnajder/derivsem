@@ -1,5 +1,6 @@
 
 from Models import *
+from Models import get_neighbors
 from scipy.stats import pearsonr, spearmanr
 import scipy as sp
 from scipy import stats
