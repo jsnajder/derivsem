@@ -48,9 +48,9 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
 def main():
 
     partitioned_pairs_file = sys.argv[1]
-    model_id = sys.argv[2]
-    space_id = sys.argv[3]
-    patterns_file = sys.argv[4]
+    patterns_file = sys.argv[2]
+    model_id = sys.argv[3]
+    space_id = sys.argv[4]
     results_file = sys.argv[5]
 
     partitioned_pairs_df = pd.read_csv(partitioned_pairs_file, index_col=0)
