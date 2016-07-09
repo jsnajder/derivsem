@@ -90,6 +90,10 @@ def get_neighbors(vector, space, n_neighbors=5, pos=None):
     return [(space.id2row[i], sims_to_matrix[i, 0]) for i in sorted_perm[:n_neighbors]]
 
 
+def avg_neighbors_sim(vect, space, n_neighbors=5, pos=None):
+    return sp.mean([sim for _, sim in get_neighbors(vect, space, n_neighbors=n_neighbors, pos=pos)])
+
+
 ##############################################################################
 
 
@@ -254,10 +258,6 @@ def argmax(xs, f):
 def argmin(xs, f):
     index, _ = min(enumerate(xs), key=lambda x: f(itemgetter(1)(x)))
     return index
-
-
-def avg_neighbors_sim(vect, space, n_neighbors=5, pos=None):
-    return sp.mean([sim for _, sim in get_neighbors(vect, space, n_neighbors=n_neighbors, pos=pos)])
 
 
 class ClusterAdditiveModel(Model):
