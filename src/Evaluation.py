@@ -106,6 +106,23 @@ def reciprocal_rank_scores(model, test_pairs, max_neighbors=None, pos=None, verb
     return sp.array(scores)
 
 
+def reciprocal_rank(model, base, derived, max_neighbors=None, pos=None, verbose=False):
+        neighbors = get_neighbors(model.predict(base, verbose), model.space, max_neighbors, pos)
+        rank = 0
+        for i, (w, _) in enumerate(neighbors):
+            if w == derived:
+                rank = i + 1
+                break
+        if verbose:
+            print("%s: correct target '%s' is at rank %d out of %d" % (base, derived, rank, len(neighbors)))
+        reciprocal_rank = 0 if rank == 0 else 1 / float(rank)
+        return reciprocal_rank
+
+
+def neighbors_avg_sim(model, base, n_neighbors=None, pos=None, verbose=False):
+    return avg_neighbors_sim(model.predict(base, verbose), model.space, n_neighbors, pos=pos)
+
+
 # Splits integer 'm' into 'n' balanced bins
 def split_integer(n, m):
     r = 0
