@@ -51,7 +51,7 @@ def main():
     model_id = sys.argv[2]
     space_id = sys.argv[3]
     patterns_file = sys.argv[4]
-    results_dir = sys.argv[5]
+    results_file = sys.argv[5]
 
     partitioned_pairs_df = pd.read_csv(partitioned_pairs_file, index_col=0)
 
@@ -80,9 +80,9 @@ def main():
 
     df = prediction_features(partitioned_pairs_df, model, patterns, verbose=False)
 
-    df.to_pickle(results_dir + 'pairs-predictions-' + model_id + '-' + space_id + '.pkl')
+    df.to_pickle(results_file + '.pkl')
 
-    df.to_csv(results_dir + 'pairs-predictions-' + model_id + '-' + space_id + '.csv')
+    df.to_csv(results_file + '.csv')
 
 if __name__ == "__main__":
     main()
