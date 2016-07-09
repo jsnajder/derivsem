@@ -50,7 +50,7 @@ def main():
     space_id = sys.argv[3]
     results_dir = sys.argv[4]
 
-    partitioned_pairs_df = pd.read_csv(partitioned_pairs_file, sep=' ')
+    partitioned_pairs_df = pd.read_csv(partitioned_pairs_file, index_col=0)
 
     space_file = {
         'cbow-w2': 'cbow/cbow_300dim_hs0/sdewac.300.cbow.hs0.w2.vsm.pkl',
