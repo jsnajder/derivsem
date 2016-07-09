@@ -11,6 +11,7 @@ from composes.matrix.sparse_matrix import SparseMatrix
 from composes.composition.lexical_function import LexicalFunction
 from composes.utils.regression_learner import LstsqRegressionLearner
 from composes.utils.regression_learner import RidgeRegressionLearner
+from Evaluation import get_neighbors
 import scipy as sp
 from sklearn import mixture
 from sklearn.cluster import KMeans
