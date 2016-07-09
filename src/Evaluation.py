@@ -88,7 +88,7 @@ def neighbors_avg_sim(model, base, n_neighbors=None, pos=None, verbose=False):
 
 
 def derived_vector_norm(model, base, verbose=False):
-    return sp.linalg.norm((model.predict(base, verbose).mat)
+    return sp.linalg.norm((model.predict(base, verbose).mat))
 
 
 def base_derived_sim(model, base, verbose=False):
