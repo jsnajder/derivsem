@@ -87,8 +87,12 @@ def neighbors_avg_sim(model, base, n_neighbors=None, pos=None, verbose=False):
     return avg_neighbors_sim(model.predict(base, verbose), model.space, n_neighbors, pos=pos)
 
 
-def diff_vector_norm(model, base, verbose=False):
-    return sp.linalg.norm((model.predict(base, verbose) - model.space.get_row(base)).mat)
+def derived_vector_norm(model, base, verbose=False):
+    return sp.linalg.norm((model.predict(base, verbose).mat)
+
+
+def base_derived_sim(model, base, verbose=False):
+    return my_cosine(model.predict(base, verbose).mat, model.space.get_row(base).mat)
 
 
 # Splits integer 'm' into 'n' balanced bins
