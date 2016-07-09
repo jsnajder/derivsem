@@ -23,7 +23,7 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
         partitioned_pairs_df = partitioned_pairs_df[partitioned_pairs_df['pattern'].isin(patterns)]
 
     for pattern, pairs_df in partitioned_pairs_df.groupby('pattern'):
-        print('Running on pattern %s with %d pairs' % (pattern, len(pattern)))
+        print('Running on pattern %s with %d pairs' % (pattern, len(pairs_df)))
         train_pairs = get_word_pairs(filter_pairs(pairs_df, pattern, 0))
         model.fit(train_pairs, verbose=verbose)
         _, target_pos = pattern_pos(pattern)
@@ -37,7 +37,8 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
             vn = derived_vector_norm(model, base)
             bs = base_derived_sim(model, base)
             df.append(pd.Series({'avg_neighbors_sim': ns, 'derived_norm': vn, 'base_derived_sim': bs, 'rr': rr}))
-        return pd.concat([partitioned_pairs_df, pd.concat(df, axis=1).T], axis=1)
+
+    return pd.concat([partitioned_pairs_df, pd.concat(df, axis=1).T], axis=1)
 
 
 ##############################################################################
@@ -73,7 +74,7 @@ def main():
 
     df.to_pickle(results_dir + 'pairs-predictions-' + model_id + '-' + space_id + '.pkl')
 
-    df.to_csv(results_dir + 'pairs-predictions-' - model_id + '-' + space_id + '.csv')
+    df.to_csv(results_dir + 'pairs-predictions-' + model_id + '-' + space_id + '.csv')
 
 if __name__ == "__main__":
     main()
