@@ -22,12 +22,13 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
     if patterns is not None:
         partitioned_pairs_df = partitioned_pairs_df[partitioned_pairs_df['pattern'].isin(patterns)]
 
+    df = []
     for pattern, pairs_df in partitioned_pairs_df.groupby('pattern'):
         print('Running on pattern %s with %d pairs' % (pattern, len(pairs_df)))
         train_pairs = get_word_pairs(filter_pairs(pairs_df, pattern, 0))
         model.fit(train_pairs, verbose=verbose)
         _, target_pos = pattern_pos(pattern)
-        df = []
+
         for _, pair in pairs_df.iterrows():
             base = pair['word1']
             derived = pair['word2']
@@ -49,7 +50,8 @@ def main():
     partitioned_pairs_file = sys.argv[1]
     model_id = sys.argv[2]
     space_id = sys.argv[3]
-    results_dir = sys.argv[4]
+    patterns_file = sys.argv[4]
+    results_dir = sys.argv[5]
 
     partitioned_pairs_df = pd.read_csv(partitioned_pairs_file, index_col=0)
 
@@ -70,7 +72,13 @@ def main():
 
     model = models[model_id]
 
-    df = prediction_features(partitioned_pairs_df, model, verbose=False)
+    if patterns_file == "all":
+        patterns = None
+    else:
+        with open(patterns_file) as f:
+            patterns = [l.partition(' ')[0] for l in f.read().splitlines()]
+
+    df = prediction_features(partitioned_pairs_df, model, patterns, verbose=False)
 
     df.to_pickle(results_dir + 'pairs-predictions-' + model_id + '-' + space_id + '.pkl')
 
