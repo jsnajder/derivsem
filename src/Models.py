@@ -9,9 +9,10 @@
 from composes.matrix.dense_matrix import DenseMatrix
 from composes.matrix.sparse_matrix import SparseMatrix
 from composes.composition.lexical_function import LexicalFunction
+from composes.semantic_space.space import Space
+from composes.similarity.cos import CosSimilarity
 from composes.utils.regression_learner import LstsqRegressionLearner
 from composes.utils.regression_learner import RidgeRegressionLearner
-from Evaluation import get_neighbors
 import scipy as sp
 from sklearn import mixture
 from sklearn.cluster import KMeans
@@ -52,6 +53,41 @@ def get_row_dense(space, word):
         return v.todense()
     else:
         raise NameError('get_row_dense: unknown data type')
+
+
+def check_pos(word, pos):
+    try:
+        return word.split('_')[1] == pos
+    except IndexError:
+        return False
+
+
+# Filters space by POS
+def space_pos_filter(space, pos):
+    ix = []
+    ws = []
+    for i, w in enumerate(space.id2row):
+        if check_pos(w, pos):
+            ix.append(i)
+            ws.append(w)
+    m = space.cooccurrence_matrix[ix]
+    rows = ws
+    cols = space.id2column
+    return Space(m, rows, cols)
+
+
+# Gets nearest neighbors of a given vector (DISSECT has no function for that)
+# If n_neighbors == None, returns all neighbors (sorted by cosine similarity)
+def get_neighbors(vector, space, n_neighbors=5, pos=None):
+    if pos is not None:
+        space = space_pos_filter(space, pos)
+    targets = space.id2row
+    if n_neighbors is None:
+        n_neighbors = len(targets)
+    n_neighbors = min(n_neighbors, len(targets))
+    sims_to_matrix = CosSimilarity().get_sims_to_matrix(vector, space.cooccurrence_matrix)
+    sorted_perm = sims_to_matrix.sorted_permutation(sims_to_matrix.sum, 1)
+    return [(space.id2row[i], sims_to_matrix[i, 0]) for i in sorted_perm[:n_neighbors]]
 
 
 ##############################################################################
