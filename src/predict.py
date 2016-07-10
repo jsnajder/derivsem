@@ -20,16 +20,16 @@ data_path = '/data/dsm/sdewac/'
 
 def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=False):
     if patterns is not None:
-        partitioned_pairs_df = partitioned_pairs_df[partitioned_pairs_df['pattern'].isin(patterns)]
+        partitioned_pairs_df = (partitioned_pairs_df[partitioned_pairs_df['pattern'].isin(patterns)])
 
-    df = []
+    df = pd.DataFrame()
     for pattern, pairs_df in partitioned_pairs_df.groupby('pattern'):
         print('Running on pattern %s with %d pairs' % (pattern, len(pairs_df)))
         train_pairs = get_word_pairs(filter_pairs(pairs_df, pattern, 0))
         model.fit(train_pairs, verbose=verbose)
         _, target_pos = pattern_pos(pattern)
 
-        for _, pair in pairs_df.iterrows():
+        for i, pair in pairs_df.iterrows():
             base = pair['word1']
             derived = pair['word2']
             print('\t %s %s' % (pair['word1'], pair['word2']))
@@ -37,9 +37,9 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
             ns = neighbors_avg_sim(model, base, pos=target_pos)
             vn = derived_vector_norm(model, base)
             bs = base_derived_sim(model, base)
-            df.append(pd.Series({'avg_neighbors_sim': ns, 'derived_norm': vn, 'base_derived_sim': bs, 'rr': rr}))
+            df = df.append(pd.Series({'avg_neighbors_sim': ns, 'derived_norm': vn, 'base_derived_sim': bs, 'rr': rr}, name=i))
 
-    return pd.concat([partitioned_pairs_df, pd.concat(df, axis=1).T], axis=1)
+    return partitioned_pairs_df.join(df)
 
 
 ##############################################################################
