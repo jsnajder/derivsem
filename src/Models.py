@@ -159,12 +159,12 @@ class LexfunModel(Model):
 
     lexfun = None
 
-    def __init__(self, space, learner='LeastSquares', param=None):
+    def __init__(self, space, learner='LeastSquares', intercept=True, param=None):
         # super(LexfunModel, self).__init__(space)
         Model.__init__(self, space)
         if learner == 'Ridge':
             # If param==None, generalized CV will be performed within standard param range
-            learner = RidgeRegressionLearner(param=param)
+            learner = RidgeRegressionLearner(intercept=intercept, param=param)
         elif learner == 'LeastSquares':
             learner = LstsqRegressionLearner()
         else:
