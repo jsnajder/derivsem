@@ -164,7 +164,7 @@ class LexfunModel(Model):
         Model.__init__(self, space)
         if learner == 'Ridge':
             # If param==None, generalized CV will be performed within standard param range
-            learner = RidgeRegressionLearner(param)
+            learner = RidgeRegressionLearner(param=param)
         elif learner == 'LeastSquares':
             learner = LstsqRegressionLearner()
         else:
