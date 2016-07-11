@@ -17,19 +17,29 @@ data_path = '/data/dsm/sdewac/'
 
 ##############################################################################
 
-
-def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=False):
+def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=False, pattern_map={}):
     if patterns is not None:
-        partitioned_pairs_df = (partitioned_pairs_df[partitioned_pairs_df['pattern'].isin(patterns)])
+        partitioned_pairs_df = partitioned_pairs_df[partitioned_pairs_df['pattern'].isin(patterns)]
+
+    def map_pattern(p):
+        return pattern_map.get(p, p)
+
+    partitioned_pairs_df['superpattern'] = partitioned_pairs_df.apply(lambda x: map_pattern(x['pattern']), axis=1)
 
     df = pd.DataFrame()
-    for pattern, pairs_df in partitioned_pairs_df.groupby('pattern'):
-        print('Running on pattern %s with %d pairs' % (pattern, len(pairs_df)))
-        train_pairs = get_word_pairs(filter_pairs(pairs_df, pattern, 0))
-        model.fit(train_pairs, verbose=verbose)
-        _, target_pos = pattern_pos(pattern)
 
+    for superpattern, pairs_df in partitioned_pairs_df.groupby('superpattern'):
+
+        print('Running on superpattern %s with %d pairs' % (superpattern, len(pairs_df)))
+        pairs_train_df = pairs_df[pairs_df['partition'] == 0]
+        print('Training on %d pairs...' % len(pairs_train_df))
+        train_pairs = get_word_pairs(pairs_train_df)
+        model.fit(train_pairs, verbose=verbose)
+
+        print('Testing on %d pairs...' % len(pairs_df))
         for i, pair in pairs_df.iterrows():
+            _, target_pos = pattern_pos(pair['pattern'])
+            print('target pos is %s' % target_pos)
             base = pair['word1']
             derived = pair['word2']
             print('\t %s %s' % (pair['word1'], pair['word2']))
@@ -37,7 +47,8 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
             ns = neighbors_avg_sim(model, base, pos=target_pos)
             vn = derived_vector_norm(model, base)
             bs = base_derived_sim(model, base)
-            df = df.append(pd.Series({'avg_neighbors_sim': ns, 'derived_norm': vn, 'base_derived_sim': bs, 'rr': rr}, name=i))
+            df = df.append(
+                pd.Series({'avg_neighbors_sim': ns, 'derived_norm': vn, 'base_derived_sim': bs, 'rr': rr}, name=i))
 
     return partitioned_pairs_df.join(df)
 
@@ -51,7 +62,8 @@ def main():
     patterns_file = sys.argv[2]
     model_id = sys.argv[3]
     space_id = sys.argv[4]
-    results_file = sys.argv[5]
+    pattern_map_file = sys.arg[5]
+    results_file = sys.argv[6]
 
     partitioned_pairs_df = pd.read_csv(partitioned_pairs_file, index_col=0)
 
@@ -72,13 +84,24 @@ def main():
 
     model = models[model_id]
 
-    if patterns_file == "all":
+    if patterns_file == "None":
         patterns = None
     else:
         with open(patterns_file) as f:
             patterns = [l.partition(' ')[0] for l in f.read().splitlines()]
 
-    df = prediction_features(partitioned_pairs_df, model, patterns, verbose=False)
+    if pattern_map_file == "None":
+        pattern_map = {}
+    else:
+        pattern_map = {}
+        with open(pattern_map_file) as f:
+            for l in f.read().splitlines():
+                xs = l.split(' ')
+                superpattern = xs[0]
+                for p in xs[1:]:
+                    pattern_map[p] = superpattern
+
+    df = prediction_features(partitioned_pairs_df, model, patterns, verbose=False, pattern_map=pattern_map)
 
     df.to_pickle(results_file + '.pkl')
 
