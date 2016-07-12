@@ -41,7 +41,7 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
             _, target_pos = pattern_pos(pair['pattern'])
             base = pair['word1']
             derived = pair['word2']
-            print('\t %s %s' % (pair['word1'], pair['word2']))
+            print('\t %s %s %s' % (pair['pattern'], pair['word1'], pair['word2']))
             rr = reciprocal_rank(model, base, derived, pos=target_pos)
             ns = neighbors_avg_sim(model, base, pos=target_pos)
             vn = derived_vector_norm(model, base)
