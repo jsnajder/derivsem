@@ -18,12 +18,6 @@ data_path = '/data/dsm/sdewac/'
 ##############################################################################
 
 def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=False, pattern_map={}):
-
-    print('Running prediction on patterns %s' % patterns)
-
-    if patterns is not None:
-        partitioned_pairs_df = partitioned_pairs_df[partitioned_pairs_df['pattern'].isin(patterns)]
-
     def map_pattern(p):
         return pattern_map.get(p, p)
 
@@ -33,18 +27,30 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
 
     for superpattern, pairs_df in partitioned_pairs_df.groupby('superpattern'):
 
-        print('Running on superpattern %s with %d pairs' % (superpattern, len(pairs_df)))
+        # Training an all patterns of a supergroup
+        print('Running on superpattern "%s" with %d pairs' % (superpattern, len(pairs_df)))
+
+        # Skip supergroup if none of the selected patterns in this superpattern group
+        if (patterns is not None) and not (set(pairs_df['pattern']) & set(patterns)):
+            print('Skipping this supergroup')
+            continue
+
         pairs_train_df = pairs_df[pairs_df['partition'] == 0]
         print('Training on %d pairs...' % len(pairs_train_df))
         train_pairs = get_word_pairs(pairs_train_df)
         model.fit(train_pairs, verbose=verbose)
 
-        print('Testing on %d pairs...' % len(pairs_df))
-        for i, pair in pairs_df.iterrows():
+        # Filter selected patterns for testing
+        if patterns is not None:
+            pairs_filtered_df = pairs_df[pairs_df['pattern'].isin(patterns)]
+
+        # Test on selected patterns
+        print('Testing on %d pairs...' % len(pairs_filtered_df))
+        for i, pair in pairs_filtered_df.iterrows():
             _, target_pos = pattern_pos(pair['pattern'])
             base = pair['word1']
             derived = pair['word2']
-            print('\t %s %s %s' % (pair['pattern'], pair['word1'], pair['word2']))
+            print('\t %s %s' % (pair['word1'], pair['word2']))
             rr = reciprocal_rank(model, base, derived, pos=target_pos)
             ns = neighbors_avg_sim(model, base, pos=target_pos)
             vn = derived_vector_norm(model, base)
