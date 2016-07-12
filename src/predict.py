@@ -62,7 +62,7 @@ def main():
     patterns_file = sys.argv[2]
     model_id = sys.argv[3]
     space_id = sys.argv[4]
-    pattern_map_file = sys.arg[5]
+    pattern_map_file = sys.argv[5]
     results_file = sys.argv[6]
 
     partitioned_pairs_df = pd.read_csv(partitioned_pairs_file, index_col=0)
