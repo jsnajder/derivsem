@@ -84,13 +84,15 @@ def main():
 
     model = models[model_id]
 
-    if patterns_file == "None":
+    if patterns_file == 'None':
         patterns = None
     else:
+        patterns = []
         with open(patterns_file) as f:
-            patterns = [l.partition(' ')[0] for l in f.read().splitlines()]
+            for l in f.read().splitlines():
+                patterns += l.split(' ')
 
-    if pattern_map_file == "None":
+    if pattern_map_file == 'None':
         pattern_map = {}
     else:
         pattern_map = {}
