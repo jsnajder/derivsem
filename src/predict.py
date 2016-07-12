@@ -18,8 +18,9 @@ data_path = '/data/dsm/sdewac/'
 ##############################################################################
 
 def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=False, pattern_map={}):
-    print('Running on patterns %s', patterns)
-    
+
+    print('Running prediction on patterns %s' % patterns)
+
     if patterns is not None:
         partitioned_pairs_df = partitioned_pairs_df[partitioned_pairs_df['pattern'].isin(patterns)]
 
