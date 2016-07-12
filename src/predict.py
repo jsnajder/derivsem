@@ -39,7 +39,6 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
         print('Testing on %d pairs...' % len(pairs_df))
         for i, pair in pairs_df.iterrows():
             _, target_pos = pattern_pos(pair['pattern'])
-            print('target pos is %s' % target_pos)
             base = pair['word1']
             derived = pair['word2']
             print('\t %s %s' % (pair['word1'], pair['word2']))
