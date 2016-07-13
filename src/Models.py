@@ -151,7 +151,7 @@ class AdditiveModel(Model):
 
 
 ##############################################################################
-# Lexfun model
+# WeightedAdditiveModel model
 # This uses the DISSECT's LexicalFunction class, which turned out to be a
 # bit awkward as the APIs are quite different
 
@@ -168,10 +168,13 @@ class WeightedAdditiveModel(AdditiveModel):
         AdditiveModel.fit(self, train_pairs, verbose=verbose)
         if verbose:
             print 'fit: Fitting a weighted additive model on %d pairs' % (len(train_pairs))
+        # First, we embed the derived vector into the original space (by simply adding a row)
+        vec_space = Space(self.diff_vector, ['pattern_vector'], [])
+        new_space = Space.vstack(self.space, vec_space)
         #  class is designed to be run on a dataset with different function words (==patterns).
         # We use a dummy function word here.
-        train_pairs_ext = [(base, self.diff_vector, derived) for (base, derived) in train_pairs]
-        self.weighted_additive.train(train_pairs_ext, self.space, self.space)
+        train_pairs_ext = [(base, 'pattern_vector', derived) for (base, derived) in train_pairs]
+        self.weighted_additive.train(train_pairs_ext, new_space, new_space)
 
     def predict(self, base, verbose=False):
         if self.weighted_additive is None:
