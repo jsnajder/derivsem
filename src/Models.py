@@ -181,7 +181,7 @@ class WeightedAdditiveModel(AdditiveModel):
             raise NameError('Error: Model has not yet been trained')
         composed_space = self.weighted_additive.compose([(base, 'pattern_vector', 'derived')], self.space)
         return composed_space.get_row('derived')
-    
+
 
 
 ##############################################################################
