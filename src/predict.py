@@ -44,7 +44,7 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
         if patterns is not None:
             pairs_filtered_df = pairs_df[pairs_df['pattern'].isin(patterns)]
 
-        # Test on selected patterns
+        # Test on selected patterns only
         print('Testing on %d pairs...' % len(pairs_filtered_df))
         for i, pair in pairs_filtered_df.iterrows():
             _, target_pos = pattern_pos(pair['pattern'])
@@ -55,10 +55,11 @@ def prediction_features(partitioned_pairs_df, model, patterns=None, verbose=Fals
             ns = neighbors_avg_sim(model, base, pos=target_pos)
             vn = derived_vector_norm(model, base)
             bs = base_derived_sim(model, base)
-            df = df.append(
-                pd.Series({'avg_neighbors_sim': ns, 'derived_norm': vn, 'base_derived_sim': bs, 'rr': rr}, name=i))
+            df = df.append(pd.Series({'pattern': pair['pattern'], 'word1': base, 'word2': derived,
+                                      'avg_neighbors_sim': ns, 'derived_norm': vn, 'base_derived_sim': bs, 'rr': rr},
+                                     name=i))
 
-    return partitioned_pairs_df.join(df)
+    return partitioned_pairs_df.merge(df)
 
 
 ##############################################################################
