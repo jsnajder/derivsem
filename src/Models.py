@@ -9,6 +9,7 @@
 from composes.matrix.dense_matrix import DenseMatrix
 from composes.matrix.sparse_matrix import SparseMatrix
 from composes.composition.lexical_function import LexicalFunction
+from composes.composition.weighted_additive import WeightedAdditive
 from composes.semantic_space.space import Space
 from composes.similarity.cos import CosSimilarity
 from composes.utils.regression_learner import LstsqRegressionLearner
@@ -147,6 +148,36 @@ class AdditiveModel(Model):
         if self.diff_vector is None:
             raise NameError('Error: Model has not yet been trained')
         return self.space.get_row(base) + self.diff_vector
+
+
+##############################################################################
+# Lexfun model
+# This uses the DISSECT's LexicalFunction class, which turned out to be a
+# bit awkward as the APIs are quite different
+
+
+class WeightedAdditiveModel(AdditiveModel):
+
+    weighted_additive = None
+
+    def __init__(self, space, alpha=None, beta=None):
+        AdditiveModel.__init__(self, space)
+        self.weighted_additive = WeightedAdditive(alpha=alpha, beta=beta)
+
+    def fit(self, train_pairs, verbose=False):
+        AdditiveModel.fit(self, train_pairs, verbose=verbose)
+        if verbose:
+            print 'fit: Fitting a weighted additive model on %d pairs' % (len(train_pairs))
+        #  class is designed to be run on a dataset with different function words (==patterns).
+        # We use a dummy function word here.
+        train_pairs_ext = [(base, self.diff_vector, derived) for (base, derived) in train_pairs]
+        self.weighted_additive.train(train_pairs_ext, self.space, self.space)
+
+    def predict(self, base, verbose=False):
+        if self.weighted_additive is None:
+            raise NameError('Error: Model has not yet been trained')
+        composed_space = self.weighted_additive.compose([('dummy', base, 'derived')], self.space)
+        return composed_space.get_row('derived')
 
 
 ##############################################################################
