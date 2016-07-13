@@ -159,6 +159,7 @@ class AdditiveModel(Model):
 class WeightedAdditiveModel(AdditiveModel):
 
     weighted_additive = None
+    new_space = None
 
     def __init__(self, space, alpha=None, beta=None):
         AdditiveModel.__init__(self, space)
@@ -170,16 +171,16 @@ class WeightedAdditiveModel(AdditiveModel):
             print 'fit: Fitting a weighted additive model on %d pairs' % (len(train_pairs))
         # First, we embed the derived vector into the original space (by simply adding a row)
         vec_space = Space(self.diff_vector, ['pattern_vector'], [])
-        self.space = Space.vstack(self.space, vec_space)
+        self.new_space = Space.vstack(self.space, vec_space)
         #  class is designed to be run on a dataset with different function words (==patterns).
         # We use a dummy function word here.
         train_pairs_ext = [(base, 'pattern_vector', derived) for (base, derived) in train_pairs]
-        self.weighted_additive.train(train_pairs_ext, self.space, self.space)
+        self.weighted_additive.train(train_pairs_ext, self.new_space, self.new_space)
 
     def predict(self, base, verbose=False):
         if self.weighted_additive is None:
             raise NameError('Error: Model has not yet been trained')
-        composed_space = self.weighted_additive.compose([(base, 'pattern_vector', 'derived')], self.space)
+        composed_space = self.weighted_additive.compose([(base, 'pattern_vector', 'derived')], self.new_space)
         return composed_space.get_row('derived')
 
 
