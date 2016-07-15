@@ -90,7 +90,8 @@ def main():
         'add' : AdditiveModel(space),
         'lexfun' : LexfunModel(space, learner='Ridge'),
         'wadd' : WeightedAdditiveModel(space),
-        'mul': MultiplicativeModel(space)
+        'mul': MultiplicativeModel(space),
+        'waddx': WeightedAdditiveModel(space, no_diff=True),
     }
 
     model = models[model_id]
