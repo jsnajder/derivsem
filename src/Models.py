@@ -161,13 +161,13 @@ class MultiplicativeModel(Model):
         else:
             if verbose:
                 print('fit: Fitting a multiplicative model on %d pairs' % n)
-            bases = train_pairs[:, 0]
-            derivs = train_pairs[:, 1]
-            b = self.space.get_rows(bases)
-            d = self.space.get_rows(derivs)
-            db = sp.multiply(b, d)
-            bb = sp.multiply(b, b)
-            self.mul_vector = db.sum(axis=0) / (n * bb.sum(axis=0))
+            bases = [w for w, _ in train_pairs]
+            derivs = [w for _, w in train_pairs]
+            B = self.space.get_rows(bases)
+            D = self.space.get_rows(derivs)
+            DB = sp.multiply(B, D)
+            BB = sp.multiply(B, B)
+            self.mul_vector = DB.sum(axis=0) / (n * BB.sum(axis=0))
 
     def predict(self, base, verbose=False):
         if self.mult_vector is None:
