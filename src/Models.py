@@ -172,7 +172,7 @@ class MultiplicativeModel(Model):
     def predict(self, base, verbose=False):
         if self.mul_vector is None:
             raise NameError('Error: Model has not yet been trained')
-        return DenseMatrix(sp.multiply(self.space.get_row(base), self.mul_vector))
+        return DenseMatrix(sp.multiply(self.space.get_row(base).mat, self.mul_vector))
 
 
 ##############################################################################
