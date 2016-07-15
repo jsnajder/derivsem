@@ -124,7 +124,12 @@ class BaselineModel(Model):
 class AdditiveModel(Model):
     
     diff_vector = None
-    
+    no_diff = False
+
+    def __init__(self, space, no_diff=False):
+        Model.__init__(self, space)
+        self.no_diff = no_diff
+
     def fit(self, train_pairs, verbose=False):
         if len(train_pairs) == 0:
             raise NameError('Error: Train set is empty')
@@ -137,7 +142,10 @@ class AdditiveModel(Model):
             else:
                 self.diff_vector = SparseMatrix(sp.zeros(n))
             for (base, derived) in train_pairs:
-                diff = self.space.get_row(derived) - self.space.get_row(base)
+                if self.no_diff:
+                    diff = self.space.get_row(derived)
+                else:
+                    diff = self.space.get_row(derived) - self.space.get_row(base)
                 self.diff_vector += diff
             self.diff_vector /= len(train_pairs)
         
@@ -186,8 +194,8 @@ class WeightedAdditiveModel(AdditiveModel):
     weighted_additive = None
     new_space = None
 
-    def __init__(self, space, alpha=None, beta=None):
-        AdditiveModel.__init__(self, space)
+    def __init__(self, space, alpha=None, beta=None, no_diff=False):
+        AdditiveModel.__init__(self, space, no_diff=no_diff)
         self.weighted_additive = WeightedAdditive(alpha=alpha, beta=beta)
 
     def fit(self, train_pairs, verbose=False):
