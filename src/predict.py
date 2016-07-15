@@ -4,7 +4,7 @@ from composes.utils import io_utils
 import sys
 from Data import filter_pairs, get_word_pairs, pattern_pos, partition_pairs
 from Evaluation import reciprocal_rank, neighbors_avg_sim, derived_vector_norm, base_derived_sim
-from Models import BaselineModel, AdditiveModel, LexfunModel, WeightedAdditiveModel
+from Models import BaselineModel, AdditiveModel, LexfunModel, WeightedAdditiveModel, MultiplicativeModel
 
 
 ##############################################################################
@@ -89,7 +89,8 @@ def main():
         'baseline' : BaselineModel(space),
         'add' : AdditiveModel(space),
         'lexfun' : LexfunModel(space, learner='Ridge'),
-        'wadd' : WeightedAdditiveModel(space)
+        'wadd' : WeightedAdditiveModel(space),
+        'mul': MultiplicativeModel(space)
     }
 
     model = models[model_id]
