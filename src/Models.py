@@ -163,8 +163,8 @@ class MultiplicativeModel(Model):
                 print('fit: Fitting a multiplicative model on %d pairs' % n)
             bases = [w for w, _ in train_pairs]
             derivs = [w for _, w in train_pairs]
-            B = self.space.get_rows(bases)
-            D = self.space.get_rows(derivs)
+            B = self.space.get_rows(bases).mat
+            D = self.space.get_rows(derivs).mat
             DB = sp.multiply(B, D)
             BB = sp.multiply(B, B)
             self.mul_vector = DB.sum(axis=0) / (n * BB.sum(axis=0))
