@@ -128,9 +128,6 @@ class AdditiveModel(Model):
     def fit(self, train_pairs, verbose=False):
         if len(train_pairs) == 0:
             raise NameError('Error: Train set is empty')
-            # warnings.warn('fit: train set is empty, defaulting to baseline', UserWarning)
-            # set difference vector to empty vector
-            # self.diff_vector = DenseMatrix(sp.zeros(1))
         else:
             if verbose:
                 print 'fit: Computing the diff vector across %d pairs' % (len(train_pairs))
@@ -148,6 +145,34 @@ class AdditiveModel(Model):
         if self.diff_vector is None:
             raise NameError('Error: Model has not yet been trained')
         return self.space.get_row(base) + self.diff_vector
+
+
+##############################################################################
+
+
+def MultiplicativeModel(Model):
+
+    mul_vector = None
+
+    def fit(self, train_pairs, verbose=False):
+        n = len(train_pairs)
+        if n == 0:
+            raise NameError('Error: Train set is empty')
+        else:
+            if verbose:
+                print('fit: Fitting a multiplicative model on %d pairs' % n)
+            bases = train_pairs[:, 0]
+            derivs = train_pairs[:, 1]
+            b = self.space.get_rows(bases)
+            d = self.space.get_rows(derivs)
+            db = sp.multiply(b, d)
+            bb = sp.multiply(b, b)
+            self.mul_vector = db.sum(axis=0) / (n * bb.sum(axis=0))
+
+    def predict(self, base, verbose=False):
+        if self.mult_vector is None:
+            raise NameError('Error: Model has not yet been trained')
+        return self.space.get_row(base).dot(mul_vector)
 
 
 ##############################################################################
