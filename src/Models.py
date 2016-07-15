@@ -152,7 +152,7 @@ class AdditiveModel(Model):
 
 class MultiplicativeModel(Model):
 
-    mul_vector = None
+    mul_vector_ = None
 
     def fit(self, train_pairs, verbose=False):
         n = len(train_pairs)
@@ -170,9 +170,9 @@ class MultiplicativeModel(Model):
             self.mul_vector = DB.sum(axis=0) / (n * BB.sum(axis=0))
 
     def predict(self, base, verbose=False):
-        if self.mult_vector is None:
+        if self.mul_vector is None:
             raise NameError('Error: Model has not yet been trained')
-        return self.space.get_row(base).dot(self.mul_vector)
+        return DenseMatrix(sp.multiply(self.space.get_row(base), self.mul_vector))
 
 
 ##############################################################################
