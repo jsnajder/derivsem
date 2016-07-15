@@ -150,7 +150,7 @@ class AdditiveModel(Model):
 ##############################################################################
 
 
-def MultiplicativeModel(Model):
+class MultiplicativeModel(Model):
 
     mul_vector = None
 
@@ -172,7 +172,7 @@ def MultiplicativeModel(Model):
     def predict(self, base, verbose=False):
         if self.mult_vector is None:
             raise NameError('Error: Model has not yet been trained')
-        return self.space.get_row(base).dot(mul_vector)
+        return self.space.get_row(base).dot(self.mul_vector)
 
 
 ##############################################################################
